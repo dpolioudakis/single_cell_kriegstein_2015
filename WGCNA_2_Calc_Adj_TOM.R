@@ -27,11 +27,12 @@ softPower <- 17
 # correlation since it is more robust to outliers.
 
 print("Starting adjacency calculation...")
-adjacency <- adjacency(exDatDF, power= softPower, corFnc= "bicor")
+adjacency <- adjacency(exDatDF, power = softPower, corFnc= "bicor"
+                       , similarity = "signed")
 print("Finished adjacency calculation...")
 
 print("Starting TOM calculation...")
-TOM <- TOMsimilarity(adjacency)
+TOM <- TOMsimilarity(adjacency, TOMType = "signed")
 dissTOM <- 1-TOM
 print("Finished TOM calculation...")
 

@@ -91,5 +91,5 @@ plotDendroAndColors(geneTree
                     , main="Dendrogram With Different Module Cutting Parameters")
 dev.off()
 
-save(exprData, geneTree, modulesColors, moduleParameterLabels,
+save(exDatDF, geneTree, modulesColors, moduleParameterLabels,
      file="../processed_data/allen_modules.rda")

@@ -21,11 +21,11 @@ options(stringsAsFactors=FALSE)
 allowWGCNAThreads()
 disableWGCNAThreads() 
 
-load("../data/WGCNA_2_Adjacency_TOM.rda")
+load("../data/WGCNA_2_Adjacency_TOM_SP12.rda")
 load("../data/Expr_Ft_1E10S.rda")
 exDatDF <- t(exDatFiltDF)
 
-softPower <- 17
+softPower <- 12
 
 geneTree <- hclust(as.dist(dissTOM), method = "average")
 
@@ -58,7 +58,7 @@ Merge_modules_ME <- function (genesModuleColor, cutHeightMergeME) {
 
 # Test different parameters for constructing and merging modules
 # Define arguments to test for cutreeHybrid
-minModSizes <- c(30, 100, 160)
+minModSizes <- c(30, 50, 100)
 deepSplits <- c(2, 4)
 cutHeightMergeMEs <- c(0.1, 0.2, 0.25)
 modulesColors <- NULL

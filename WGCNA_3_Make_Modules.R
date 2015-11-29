@@ -92,4 +92,4 @@ plotDendroAndColors(geneTree
 dev.off()
 
 save(exDatDF, geneTree, modulesColors, moduleParameterLabels,
-     file="../data/allen_modules.rda")
+     file="../data/WGCNA_3_Modules.rda")

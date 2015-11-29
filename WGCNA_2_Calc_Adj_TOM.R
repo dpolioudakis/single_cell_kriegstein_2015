@@ -28,7 +28,7 @@ softPower <- 17
 
 print("Starting adjacency calculation...")
 adjacency <- adjacency(exDatDF, power = softPower, corFnc= "bicor"
-                       , similarity = "signed")
+                       , type = "signed")
 print("Finished adjacency calculation...")
 
 print("Starting TOM calculation...")

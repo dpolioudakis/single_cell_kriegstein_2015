@@ -38,6 +38,5 @@ print("Finished TOM calculation...")
 save(adjacency, TOM, dissTOM
      , file = paste("../data/WGCNA_2_Adjacency_TOM_SP", softPower, ".rda"
                     , sep = ""))
-print("Finished TOM calculation...")
 
 print("End of WGCNA_2_Calc_Adj_TOM.R script...")

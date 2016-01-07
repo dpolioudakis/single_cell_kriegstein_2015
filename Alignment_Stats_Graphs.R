@@ -7,7 +7,6 @@ sessionInfo()
 library(ggplot2)
 library(reshape2)
 
-
 # Input gene expression and metadata
 exDatDF <- read.csv("../data/mmc3.csv", header = TRUE, row.names = 1)
 metDatDF <- read.csv("../data/mmc2.csv", header = TRUE)

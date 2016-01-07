@@ -58,9 +58,16 @@ Merge_modules_ME <- function (genesModuleColor, cutHeightMergeME) {
 
 # Test different parameters for constructing and merging modules
 # Define arguments to test for cutreeHybrid
+
+
 minModSizes <- c(30, 50, 100)
 deepSplits <- c(2, 4)
 cutHeightMergeMEs <- c(0.1, 0.2, 0.25)
+
+minModSizes <- c(30, 50)
+deepSplits <- c(2)
+cutHeightMergeMEs <- c(0.1)
+
 modulesColors <- NULL
 moduleParameterLabels <- NULL
 for (minModSize in minModSizes) {
@@ -80,9 +87,12 @@ for (minModSize in minModSizes) {
     }
   }
 }
+print("Done making modules...")
 
-sizeGrWindow(25,20)
-pdf("../analysis/graphs/WGCNA_3_Dendro_Module_Parameters.pdf",height=25,width=20)
+#sizeGrWindow(25,20)
+print("Making modules graph...")
+pdf(file = paste("../analysis/graphs/WGCNA_3_Dendro_Module_Parameters_SP", softPower, ".pdf", sep = ""), height = 25, width = 20)
+print("Calling WGCNA function...")
 plotDendroAndColors(geneTree
                     , modulesColors
                     , groupLabels=moduleParameterLabels
@@ -92,4 +102,4 @@ plotDendroAndColors(geneTree
 dev.off()
 
 save(exDatDF, geneTree, modulesColors, moduleParameterLabels,
-     file="../data/WGCNA_3_Modules.rda")
+     file= paste("../data/WGCNA_3_Modules_SP", softPower, ".rda", sep = ""))

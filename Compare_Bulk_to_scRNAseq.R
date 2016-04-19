@@ -42,6 +42,8 @@ dir.create(file.path(outGenesListDir, "Lists"))
 dir.create(file.path(outGenesListDir, "Background"))
 dir.create(file.path(outGenesListDir, "Background_HighExpr"))
 dir.create(file.path(outGenesListDir, "Background_LowExpr"))
+dir.create(file.path(outGenesListDir, "GO_Elite_Output_LowExpr"))
+dir.create(file.path(outGenesListDir, "GO_Elite_Output_HighExpr"))
 
 ## Set ggplot2 theme
 theme_set(theme_bw())
@@ -145,14 +147,14 @@ biasDF <- rbind(
   # Transcripts > 0.5 M (log ratio) towards bulk and > 0 A (mean average)
   # (expression > ~1 TPM)
     Genes = maDF[maDF$Avg > 0 & maDF$Log2Ratio < -0.5, ]
-    , Gene_Set = "Higher Expression, Higher Bulk")
+    , Gene_Set = "High Expression, Higher Bulk")
   
   , data.frame(
   # How expressed bias towards scRNAseq
   # Transcripts > 0.5 M (log ratio) towards pooled scRNAseq and > 0 A (mean
   # average) (expression > ~1 TPM)
     Genes = maDF[maDF$Avg > 0 & maDF$Log2Ratio > 0.5, ]
-    , Gene_Set = "Higher Expression, Higher Pooled")
+    , Gene_Set = "High Expression, Higher Pooled")
 )
 ################################################################################
 
@@ -181,7 +183,7 @@ ggplot(nSamples, aes(y = Number_of_Samples, x = Gene_Set, fill = Gene_Set)) +
   ggtitle(paste0("Compare_Bulk_to_scRNAseq.R"
                , "\nNumber of Genes in Subsets with Biased Expression"
                , "\n"))
-ggsave(paste0(outGraph, "Subsets_Numbers.pdf"))
+ggsave(paste0(outGraph, "Subsets_Numbers.pdf"), width = 8)
 
 
 ## Length Bias Plot
@@ -190,7 +192,7 @@ ggplot(biasDF, aes(y = UnionExonLength, x = Gene_Set, col = Gene_Set)) +
   geom_boxplot(outlier.shape = NA) +
   # Adjust limits after outlier removal
   coord_cartesian(ylim = range(boxplot(biasDF[
-    biasDF$Gene_Set == "Higher Expression, Higher Bulk", ]$UnionExonLength
+    biasDF$Gene_Set == "High Expression, Higher Bulk", ]$UnionExonLength
     , plot = FALSE)$stats) * c(.9, 1.1)) +
   geom_text(data = meansLength, aes(label = paste("Mean:", round(UnionExonLength, 2)), y = UnionExonLength)) +
   geom_text(data = nSamples, aes(label = paste("n =", Number_of_Samples)
@@ -205,11 +207,11 @@ ggplot(biasDF, aes(y = UnionExonLength, x = Gene_Set, col = Gene_Set)) +
       ,signif(t.test(x = biasDF[biasDF$Gene_Set == "Low Expression, Higher Bulk", ]$UnionExonLength
       , y = biasDF[biasDF$Gene_Set == "Low Expression, Higher Pooled", ]$UnionExonLength)$p.value, 3)
     ,"\nP-value: High Expression, Higher Bulk vs Higher Pooled scRNA-seq: "
-      ,signif(t.test(x = biasDF[biasDF$Gene_Set == "Higher Expression, Higher Bulk", ]$UnionExonLength
-      , y = biasDF[biasDF$Gene_Set == "Higher Expression, Higher Pooled", ]$UnionExonLength)$p.value, 3)
+      ,signif(t.test(x = biasDF[biasDF$Gene_Set == "High Expression, Higher Bulk", ]$UnionExonLength
+      , y = biasDF[biasDF$Gene_Set == "High Expression, Higher Pooled", ]$UnionExonLength)$p.value, 3)
     , "\n")
 )
-ggsave(paste0(outGraph, "Subsets_Length.pdf"))
+ggsave(paste0(outGraph, "Subsets_Length.pdf"), width = 8)
 
 
 ## GC Bias Plot
@@ -221,7 +223,7 @@ ggplot(ggDF, aes(y = UnionGCcontent, x = Gene_Set, col = Gene_Set)) +
   geom_boxplot(outlier.shape = NA) +
   # Adjust limits after outlier removal
   coord_cartesian(ylim = range(boxplot(ggDF[
-    ggDF$Gene_Set == "Higher Expression, Higher Bulk", ]$UnionGCcontent
+    ggDF$Gene_Set == "High Expression, Higher Bulk", ]$UnionGCcontent
     , plot = FALSE)$stats) * c(.9, 1.1)) +
   geom_text(data = meansGC, aes(label = paste("Mean:", round(UnionGCcontent, 2)), y = UnionGCcontent + 0.02)) +
   geom_text(data = nSamples, aes(label = paste("n =", Number_of_Samples)
@@ -236,11 +238,11 @@ ggplot(ggDF, aes(y = UnionGCcontent, x = Gene_Set, col = Gene_Set)) +
                  ,signif(t.test(x = ggDF[ggDF$Gene_Set == "Low Expression, Higher Bulk", ]$UnionGCcontent
                                 , y = ggDF[ggDF$Gene_Set == "Low Expression, Higher Pooled", ]$UnionGCcontent)$p.value, 3)
                  ,"\nP-value: High Expression, Higher Bulk vs Higher Pooled scRNA-seq: "
-                 ,signif(t.test(x = ggDF[ggDF$Gene_Set == "Higher Expression, Higher Bulk", ]$UnionGCcontent
-                                , y = ggDF[ggDF$Gene_Set == "Higher Expression, Higher Pooled", ]$UnionGCcontent)$p.value, 3)
+                 ,signif(t.test(x = ggDF[ggDF$Gene_Set == "High Expression, Higher Bulk", ]$UnionGCcontent
+                                , y = ggDF[ggDF$Gene_Set == "High Expression, Higher Pooled", ]$UnionGCcontent)$p.value, 3)
                  , "\n")
 )
-ggsave(paste0(outGraph, "Subsets_GCcontent.pdf"))
+ggsave(paste0(outGraph, "Subsets_GCcontent.pdf"), width = 8)
 ################################################################################
 
 ### GO Analysis of subsets of genes
@@ -286,13 +288,13 @@ write.table(data.frame(
             , row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t"
 )
 write.table(data.frame(
-  ensembl_gene_id = dfList$"Higher Expression, Higher Bulk"$Row.names
+  ensembl_gene_id = dfList$"High Expression, Higher Bulk"$Row.names
     , systemCode = "En")
   , file = paste(outGenesListDir, "/lists/HighExpr_HigherBulk.txt", sep = "")
   , row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t"
 )
 write.table(data.frame(
-  ensembl_gene_id = dfList$"Higher Expression, Higher Pooled"$Row.names
+  ensembl_gene_id = dfList$"High Expression, Higher Pooled"$Row.names
     , systemCode = "En")
   , file = paste(outGenesListDir, "/lists/HighExpr_HigherPooled.txt", sep = "")
   , row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t"
@@ -323,114 +325,73 @@ Make_GO_Elite_File_List <- function (filesDir) {
   goEliteFiles <- list.files(filesDir)
   idx <- grep(".*GO_z-score_elite.txt", goEliteFiles)
   goEliteFiles <- goEliteFiles[idx]
-  head(read.csv(file = paste0(goElitePath, goEliteFiles[1]), sep = "\t"))$Ontology.Type
-  goEliteFiles
+  head(read.csv(file = paste0(filesDir, goEliteFiles[1]), sep = "\t"))$Ontology.Type
+  goEliteFiles <- paste0(filesDir, goEliteFiles)
 }
 
-Plot_GO_Elite_Results <- function (goEliteFileNamesL) {
-  for(i in 1:length(goEliteFileNamesL)){
-    thismod = goEliteFileNamesL[i]
-    nameThisMod = goEliteFileNamesL[i]
-    print(nameThisMod)
-    tmp = read.csv(file = paste0(goElitePath, goEliteFileNamesL[i]), sep = "\t")
+
+Plot_GO_Elite_Results <- function (goEliteFilePathsL) {
+  for(i in 1:length(goEliteFilePathsL)){
+    # print(goEliteFilePathsL[i])
+    thismod = basename(goEliteFilePathsL[i])
+    # nameThisMod = goEliteFilePathsL[i]
+    nameThisMod = goEliteFilePathsL
+    tmp = read.table(file = goEliteFilePathsL[i], sep = "\t", header = TRUE)
+    # tmp = tmp[tmp$Ontology.Type=="cellular_component", ]
+    tmp$Ontology.Type <- as.character(tmp$Ontology.Type)
+    ontologyTypes <- unique(tmp$Ontology.Type)
+    # Filter empty ontology values - sometimes GOElite outputs blanks
+    ontologyTypes <- ontologyTypes[! ontologyTypes == ""]
+    print(ontologyTypes)
+    
     # Loop through ontology types
-    lapply(unique(tmp$Ontology.Type), function(GOtype) {
-      tmp = subset(tmp, Ontology.Type==GOtype)
-      tmp = tmp[ ,c(2,4,9)] ## Select GO-terms and Z-score
-      tmp = tmp[order(tmp$Z.Score, decreasing = TRUE), ] #
-      tmp = tmp[which(tmp[ ,2] >= 1), ]
+    lapply(ontologyTypes, function(GOtype) {
+      tmp1 = subset(tmp, Ontology.Type==GOtype)
+      tmp1 = tmp1[ ,c(2,4,9)] ## Select GO-terms and Z-score
+      tmp1 = tmp1[order(tmp1$Z.Score, decreasing = TRUE), ] #
+      tmp1 = tmp1[which(tmp1[ ,2] >= 1), ]
       
-      if (nrow(tmp) == 0){
+      if (nrow(tmp1) == 0){
         print(paste("No enriched GO-terms for:", nameThisMod))
         next
-      } else if (nrow(tmp) < 10) {
-        tmp1 = tmp ## Take top 10 Z-score
-        tmp1 = tmp1[order(tmp1$Z.Score),] ##Re-arrange by increasing Z-score
-        par(mar=c(4,22,4,4))
-        barplot(tmp1$Z.Score, horiz = TRUE, col = "blue"
-                , names.arg = tmp1$Ontology.Name, cex.names=1.2, las=1
+      }
+      if (nrow(tmp1) < 20) {##Note this must match subset below
+        # else if (nrow(tmp) < 20) {##Note this much match subset below
+        tmp2 = tmp1 ## Take top 10 Z-score
+        tmp2 = tmp2[order(tmp2$Z.Score), ] ##Re-arrange by increasing Z-score
+        par(mar = c(4,22,4,4))
+        barplot(tmp2$Z.Score, horiz = TRUE, col = "blue"
+                , names.arg = tmp2$Ontology.Name, cex.names = 1.2, las = 1
                 , main = paste("Gene Ontology Plot of", GOtype
                                , "\n", thismod)
                 , xlab = "Z-Score")
-        abline(v=2,col="red")
-        next
-      } else {
-        tmp1 = tmp[c(1:20), ] ## Take top 10 Z-score
+        abline(v = 2, col = "red")
       }
-      tmp1 = tmp1[order(tmp1$Z.Score), ] ##Re-arrange by increasing Z-score
-      par(mar = c(4, 22, 4, 4))
-      barplot(tmp1$Z.Score, horiz = TRUE, col = "blue"
-              , names.arg = tmp1$Ontology.Name
-              , cex.names = 1.2, las = 1
-              , main = paste("Gene Ontology Plot of", GOtype
-                             , "\n", thismod)
-              , xlab = "Z-Score")
-      abline(v = 2, col = "red")
+      else {
+        tmp2 = tmp1[c(1:20), ] ## Take top 10 Z-score
+        tmp2 = tmp2[order(tmp2$Z.Score), ] ##Re-arrange by increasing Z-score
+        par(mar = c(4, 22, 4, 4))
+        barplot(tmp2$Z.Score, horiz = TRUE, col = "blue"
+                , names.arg = tmp2$Ontology.Name
+                , cex.names = 1.2, las = 1
+                , main = paste0(thismod
+                                , "\n", "Gene Ontology Plot of ", GOtype)
+                , xlab = "Z-Score")
+        abline(v = 2, col = "red")
+      }
       cat('Done ...', thismod, GOtype, '\n')
     })
   }
 }
 
-# Using all genes as background
-goEliteFileList <- Make_GO_Elite_File_List("../analysis/GO_enrichment/Subsets_MAplot_0.5_-0.5_0/GO_Elite_Output/GO-Elite_results/CompleteResults/ORA_pruned/")
-pdf("../analysis/graphs/GO_Elite.pdf", height = 6, width = 8)
-Plot_GO_Elite_Results(goEliteFileList)
-dev.off()
-
-# Using high expressed genes as background for high expresse
-goEliteFileList <- Make_GO_Elite_File_List("../analysis/GO_enrichment/Subsets_MAplot_0.5_-0.5_0/GO_Elite_Output_HighExpr/GO-Elite_results/CompleteResults/ORA_pruned/")
+# Using high expressed genes as background for high expressed
+goEliteFileList <- Make_GO_Elite_File_List("../analysis/GO_enrichment/Pooled_Vs_Bulk/Subsets_MAplot_0.5_-0.5_0/GO_Elite_Output_HighExpr/GO-Elite_results/CompleteResults/ORA_pruned/")
 pdf("../analysis/graphs/GO_Elite_HighExpr.pdf", height = 6, width = 8)
 Plot_GO_Elite_Results(goEliteFileList)
 dev.off()
 
 # Using low expressed genes as background for low expressed
-goEliteFileList <- Make_GO_Elite_File_List("../analysis/GO_enrichment/Subsets_MAplot_0.5_-0.5_0/GO_Elite_Output_LowExpr/GO-Elite_results/CompleteResults/ORA_pruned/")
+goEliteFileList <- Make_GO_Elite_File_List("../analysis/GO_enrichment/Pooled_Vs_Bulk/Subsets_MAplot_0.5_-0.5_0/GO_Elite_Output_LowExpr/GO-Elite_results/CompleteResults/ORA_pruned/")
 pdf("../analysis/graphs/GO_Elite_LowExpr.pdf", height = 6, width = 8)
 Plot_GO_Elite_Results(goEliteFileList)
-dev.off()
-
-
-
-
-
-
-uniquemodcolors = unique(colors)
-uniquemodcolors = uniquemodcolors[-which(uniquemodcolors=="grey")]
-
-pdf(outGOgraphs, height = 6, width = 8)
-
-for(i in 1:length(uniquemodcolors)){
-  thismod= uniquemodcolors[i]
-  nameThisMod = paste("MM",uniquemodcolors[i],sep="")
-  print(nameThisMod)
-  tmp=read.csv(file = paste(outModsLists
-                            , "/GO-Elite_results/CompleteResults/ORA/"
-                            , nameThisMod, "-GO_z-score_elite.txt", sep = "")
-               , sep = "\t")
-  tmp=subset(tmp,Ontology.Type=="biological_process")
-  tmp=tmp[,c(2,4,9)] ## Select GO-terms and Z-score
-  tmp=tmp[order(tmp$Z.Score,decreasing=T),] #
-  tmp=tmp[which(tmp[,2] >= 1),]
-  
-  if (nrow(tmp) == 0){
-    print(paste("No enriched GO-terms for:", nameThisMod))
-    next
-  } else if (nrow(tmp)<10) {
-    tmp1=tmp ## Take top 10 Z-score
-    tmp1 = tmp1[order(tmp1$Z.Score),] ##Re-arrange by increasing Z-score
-    par(mar=c(4,22,4,4))
-    barplot(tmp1$Z.Score,horiz=T,col="blue",names.arg= tmp1$Ontology.Name,cex.names=1.2,las=1,main=paste("Gene Ontology Plot of",thismod,"Module"),xlab="Z-Score")
-    abline(v=2,col="red")
-    next
-  } else {
-    tmp1=tmp[c(1:10),] ## Take top 10 Z-score
-  }
-  tmp1 = tmp1[order(tmp1$Z.Score),] ##Re-arrange by increasing Z-score
-  par(mar=c(4,22,4,4))
-  barplot(tmp1$Z.Score,horiz=T,col="blue",names.arg= tmp1$Ontology.Name,cex.names=1.2,las=1,main=paste("Gene Ontology Plot of",thismod,"Module"),xlab="Z-Score")
-  abline(v=2,col="red")
-  
-  cat('Done ...',thismod,'\n')
-}
-
 dev.off()

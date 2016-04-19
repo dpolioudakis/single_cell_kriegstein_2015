@@ -61,6 +61,11 @@ pScEx <- apply(scExDatDF, 1, sum)
 head(pScEx)
 tail(pScEx)
 
+# Down sample to 130 cells (same number as our good cells from C196-001-002 run)
+set.seed(11)
+rNums <- sample(1:130, 130, replace = FALSE)
+pSc130Ex <- apply(scExDatDF[ ,rNums], 1, sum)
+
 # Mean expression for bulk for each gene
 mnBuEx <- apply(buExDatDF, 1, mean)
 
@@ -80,13 +85,30 @@ ggplot(ggDF, aes(x = Pooled, y = Bulk)) +
   geom_point(alpha = 0.3, shape = 1) +
   theme_bw(base_size = 18) +
   ylab("Bulk: log2(Mean Counts + 1)") +
-  xlab("Pooled: log2(Mean Counts + 1)") +
+  xlab("Pooled: log2(Counts + 1)") +
   ggtitle(paste0(graphCodeTitle
                  , "\nPooled Kriegstein 2015 scRNAseq (VZ) vs Bulk RNAseq (VZ)"
                  , "\nHuman Fetal Brain"
                  , "\n Mean of counts across samples"
                  , "\nSpearman correlation: ", sprCorMn))
 ggsave(paste0(outGraph, "Bulk_vs_Pooled_log2p1.pdf"))
+
+## Down sampled to 130 cells (same number as our good cells from C196-001-002 run)
+# Format for ggplot2
+ggDF <- data.frame(Pooled = log(pSc130Ex + 1, 2), Bulk = log(mnBuEx + 1, 2))
+
+ggplot(ggDF, aes(x = Pooled, y = Bulk)) +
+  geom_point(alpha = 0.3, shape = 1) +
+  theme_bw(base_size = 18) +
+  ylab("Bulk: log2(Mean Counts + 1)") +
+  xlab("Pooled: log2(Counts + 1)") +
+  ggtitle(paste0(graphCodeTitle
+                 , "\nPooled Kriegstein 2015 scRNAseq (VZ) vs Bulk RNAseq (VZ)"
+                 , "\nDown sampled to 130 cells (same number as our good cells from C196-001-002 run)"
+                 , "\nHuman Fetal Brain"
+                 , "\n Mean of counts across samples"
+                 , "\nSpearman correlation: ", sprCorMn))
+ggsave(paste0(outGraph, "Bulk_vs_Pooled_130cells_log2p1.pdf"))
 ################################################################################
 
 ### Filter, read depth normalize, and pool in groups bulk and scRNAseq
@@ -101,7 +123,7 @@ ftScExDatDF <- scExDatDF
 
 ## Read depth normalize
 
-# Randomly split into 5 pooled groups
+# Randomly split into 5 pooled groups of 26 cells each
 
 set.seed(11)
 ncol(ftScExDatDF)
